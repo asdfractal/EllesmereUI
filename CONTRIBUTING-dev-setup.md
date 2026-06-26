@@ -166,6 +166,52 @@ git rebase upstream/main
 
 ---
 
+## Testing someone else's Pull Request locally
+
+Because your checkout is junction-linked into `AddOns`, testing a PR is just
+"check out the branch, `/reload`" — no copying or re-linking in the common case.
+
+First, **stash or commit any local changes** so checking out a branch is clean:
+
+```powershell
+git status                 # make sure you're not about to lose work
+git stash                  # if you have uncommitted changes you want to keep
+```
+
+**Option A — GitHub CLI (easiest).** With [`gh`](https://cli.github.com/)
+installed, fetch the PR by number from the upstream repo into a local branch:
+
+```powershell
+gh pr checkout 123 --repo EllesmereGaming/EllesmereUI
+```
+
+**Option B — plain git.** Fetch the PR's head ref into a local branch:
+
+```powershell
+git fetch upstream pull/123/head:pr-123
+git switch pr-123
+```
+
+Then in-game: `/reload`. The linked checkout now reflects the PR's code, so you
+test it exactly as it'll run.
+
+**When you're done**, return to your own work:
+
+```powershell
+git switch my-feature          # or your default branch
+git stash pop                  # if you stashed earlier
+# /reload in-game
+```
+
+> **Re-run the link script if the PR changed which addons exist.** Switching
+> branches updates files inside already-linked folders automatically, but if a
+> PR *adds a new sub-addon folder* (or renames one), that new folder has no
+> junction yet. Re-run `.\.tools\Link-AddOns.ps1 ... -Force` to create the
+> missing link(s); existing junctions are simply re-pointed. (Your gitignored
+> `Libs` persist across branch switches, so they don't need restoring again.)
+
+---
+
 ## Notes & troubleshooting
 
 - **Re-running is safe.** The script is idempotent — running it again just
