@@ -13,3 +13,5 @@ CLAUDE_PATTERNS.md
 
 # Developer scripts
 *.ps1
+# track the shared dev-setup helper
+!.tools/Link-AddOns.ps1
